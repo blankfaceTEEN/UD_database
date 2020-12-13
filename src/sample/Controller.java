@@ -5,15 +5,21 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -22,11 +28,18 @@ public class Controller implements Initializable {
     static final String PASS = "admin";
 
     private ObservableList<ObservableList> data;
+    private ArrayList<String> columns = new ArrayList<String>();
     public String choiceBoxValue = "tracks";
+    private boolean ascdesc = true;
+    private ArrayList<TextField> textFields = new ArrayList<>();
     @FXML
     private TableView tableDB = new TableView();
     @FXML
     private ChoiceBox tablesChoiceBox = new ChoiceBox();
+    @FXML
+    private ChoiceBox columnsChoiceBox = new ChoiceBox();
+    @FXML
+    private Button insertButton = new Button();
 
     private static Connection getDBConnection() {
         try {
@@ -55,31 +68,27 @@ public class Controller implements Initializable {
         return connection;
     }
 
-    private static void insert() throws SQLException {
-        Connection dbConnection = null;
-        Statement statement = null;
-        String insertTableSQL = "";
+    @FXML
+    private void insertWindow(ActionEvent event) throws IOException {
+        Stage stage = new Stage();
+        FXMLDocumentController(stage);
+    }
 
-        try {
-            dbConnection = getDBConnection();
-            statement = dbConnection.createStatement();
-
-            // выполнить SQL запрос
-            statement.execute(insertTableSQL);
-            System.out.println("Table \"dbuser\" is created!");
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        } finally {
-            if (statement != null) {
-                statement.close();
-            }
-            if (dbConnection != null) {
-                dbConnection.close();
-            }
-        }
+    protected void FXMLDocumentController(Stage stage) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("add.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root, 400, 400);
+        stage.getIcons().add(new Image("file:src/sample/icon.png"));
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.setTitle("Добавить запись");
+        AddController addController = (AddController) loader.getController();
+        addController.transport(columns, choiceBoxValue);
+        stage.show();
     }
 
     public void buildData() {
+        columns.clear();
         for (int i = 0; i < tableDB.getColumns().size(); i++) {
             tableDB.getColumns().clear();
         }
@@ -96,7 +105,69 @@ public class Controller implements Initializable {
                 TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i+1));
                 col.setCellValueFactory((Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>) param -> new SimpleStringProperty(param.getValue().get(j).toString()));
                 tableDB.getColumns().addAll(col);
-                System.out.println("Column ["+i+"] ");
+                System.out.println("Column ["+i+"]: " + col.getText());
+                columns.add(col.getText());
+            }
+
+            while(rs.next()) {
+                ObservableList<String> row = FXCollections.observableArrayList();
+                for(int i=1 ; i<=rs.getMetaData().getColumnCount(); i++){
+                    row.add(rs.getString(i));
+                }
+                System.out.println("Row [1] added "+row );
+                data.add(row);
+            }
+
+            tableDB.setItems(data);
+            updateGroup();
+        } catch(Exception e) {
+            e.printStackTrace();
+            System.out.println("Error on Building Data");
+        }
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        buildData();
+        tablesChoiceBox.getItems().removeAll(tablesChoiceBox.getItems());
+        tablesChoiceBox.getItems().addAll("tracks", "authors", "orders", "mood", "genres", "licenses", "playlists", "buyers", "payment_methods", "buyers_favorite_tracks", "authors_tracks", "playlists_tracks");
+        tablesChoiceBox.getSelectionModel().select("tracks");
+        updateGroup();
+        ChangeListener<String> changeListener = new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                choiceBoxValue = newValue;
+                buildData();
+            }
+        };
+        tablesChoiceBox.getSelectionModel().selectedItemProperty().addListener(changeListener);
+    }
+
+    public void grouping() {
+        columns.clear();
+        for (int i = 0; i < tableDB.getColumns().size(); i++) {
+            tableDB.getColumns().clear();
+        }
+        Connection c;
+        data = FXCollections.observableArrayList();
+        String group = "";
+
+        try {
+            c = getDBConnection();
+            if (ascdesc) {
+                group = "SELECT * from market.public." + choiceBoxValue + " ORDER BY " + columnsChoiceBox.getValue() + " ASC";
+            } else {
+                group = "SELECT * from market.public." + choiceBoxValue + " ORDER BY " + columnsChoiceBox.getValue() + " DESC";
+            }
+            ResultSet rs = c.createStatement().executeQuery(group);
+
+            for(int i=0 ; i<rs.getMetaData().getColumnCount(); i++){
+                final int j = i;
+                TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i+1));
+                col.setCellValueFactory((Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>) param -> new SimpleStringProperty(param.getValue().get(j).toString()));
+                tableDB.getColumns().addAll(col);
+                System.out.println("Column ["+i+"]: " + col.getText());
+                columns.add(col.getText());
             }
 
             while(rs.next()) {
@@ -115,18 +186,35 @@ public class Controller implements Initializable {
         }
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        tablesChoiceBox.getItems().removeAll(tablesChoiceBox.getItems());
-        tablesChoiceBox.getItems().addAll("tracks", "authors", "orders", "mood", "genres", "licenses", "playlists", "buyers", "payment_methods", "buyers_favorite_tracks", "authors_tracks", "playlists_tracks");
-        tablesChoiceBox.getSelectionModel().select("tracks");
-        ChangeListener<String> changeListener = new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                choiceBoxValue = newValue;
-                buildData();
-            }
-        };
-        tablesChoiceBox.getSelectionModel().selectedItemProperty().addListener(changeListener);
+    public void asc() {
+        ascdesc = true;
+        grouping();
+    }
+
+    public void desc() {
+        ascdesc = false;
+        grouping();
+    }
+
+    private void updateGroup() {
+        columnsChoiceBox.getItems().removeAll(columnsChoiceBox.getItems());
+        for (int i = 0; i < columns.size(); i++) {
+            columnsChoiceBox.getItems().add(columns.get(i));
+        }
+        columnsChoiceBox.getSelectionModel().select(columns.get(0));
+    }
+
+    private void updateData(String column, String newValue, String id) {
+        try (
+                Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);
+                PreparedStatement stmt = connection.prepareStatement("UPDATE " + choiceBoxValue + " SET " + column + " = ? WHERE" + id + " = ? ");
+        ) {
+            stmt.setString(1, newValue);
+            stmt.setString(2, id);
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.err.println("Error");
+            ex.printStackTrace(System.err);
+        }
     }
 }
