@@ -1,0 +1,382 @@
+CREATE TABLE "authors" (
+                           "author_id" serial NOT NULL,
+                           "last_name" varchar(32) NOT NULL,
+                           "first_name" varchar(32) NOT NULL,
+                           "patronymic" varchar(32) NOT NULL,
+                           "nickname" varchar(32) NOT NULL UNIQUE,
+                           "author_email" varchar(256) NOT NULL,
+                           "author_password" varchar NOT NULL,
+                           "payment_details" varchar NOT NULL,
+                           CONSTRAINT "authors_pk" PRIMARY KEY ("author_id")
+) WITH (
+      OIDS=FALSE
+    );
+
+CREATE TABLE "buyers" (
+                          "buyer_id" serial NOT NULL,
+                          "buyer_email" varchar(256) NOT NULL,
+                          "buyer_password" varchar NOT NULL,
+                          CONSTRAINT "buyers_pk" PRIMARY KEY ("buyer_id")
+) WITH (
+      OIDS=FALSE
+    );
+
+CREATE TABLE "tracks" (
+                          "track_id" serial NOT NULL,
+                          "track_name" varchar(64) NOT NULL,
+                          "bpm" smallint NOT NULL,
+                          "track_artwork" TEXT NOT NULL,
+                          "genre" bigint NOT NULL,
+                          "mood" bigint NOT NULL,
+                          "license" bigint NOT NULL,
+                          CONSTRAINT "tracks_pk" PRIMARY KEY ("track_id")
+) WITH (
+      OIDS=FALSE
+    );
+
+CREATE TABLE "orders" (
+                          "order_id" serial NOT NULL,
+                          "date" DATE NOT NULL,
+                          "track_id" bigint NOT NULL,
+                          "buyer_id" bigint NOT NULL,
+                          "payment_method" bigint NOT NULL,
+                          CONSTRAINT "orders_pk" PRIMARY KEY ("order_id")
+) WITH (
+      OIDS=FALSE
+    );
+
+CREATE TABLE "buyers_favorite_tracks" (
+                                          "buyer_id" serial NOT NULL,
+                                          "track_id" bigint NOT NULL,
+                                          CONSTRAINT "buyers_favorite_tracks_pk" PRIMARY KEY ("buyer_id", "track_id")
+) WITH (
+      OIDS=FALSE
+    );
+
+CREATE TABLE "genres" (
+                          "genre_id" serial NOT NULL,
+                          "genre_name" varchar(64) NOT NULL UNIQUE,
+                          CONSTRAINT "genres_pk" PRIMARY KEY ("genre_id")
+) WITH (
+      OIDS=FALSE
+    );
+
+CREATE TABLE "mood" (
+                        "mood_id" serial NOT NULL,
+                        "mood_name" varchar(64) NOT NULL UNIQUE,
+                        CONSTRAINT "mood_pk" PRIMARY KEY ("mood_id")
+) WITH (
+      OIDS=FALSE
+    );
+
+CREATE TABLE "authors_tracks" (
+                                  "author_id" bigint NOT NULL,
+                                  "track_id" bigint NOT NULL,
+                                  CONSTRAINT "authors_tracks_pk" PRIMARY KEY ("author_id", "track_id")
+) WITH (
+      OIDS=FALSE
+    );
+
+CREATE TABLE "licenses" (
+                            "license_id" serial NOT NULL,
+                            "license_name" varchar(64) NOT NULL,
+                            "license_conditions" TEXT NOT NULL,
+                            "license_price" numeric NOT NULL,
+                            CONSTRAINT "licenses_pk" PRIMARY KEY ("license_id")
+) WITH (
+      OIDS=FALSE
+    );
+
+CREATE TABLE "playlists" (
+                             "playlist_id" serial NOT NULL,
+                             "playlist_name" varchar(64) NOT NULL,
+                             "playlist_artwork" TEXT NOT NULL,
+                             CONSTRAINT "playlists_pk" PRIMARY KEY ("playlist_id")
+) WITH (
+      OIDS=FALSE
+    );
+
+CREATE TABLE "playlists_tracks" (
+                                    "playlist_id" bigint NOT NULL,
+                                    "track_id" bigint NOT NULL,
+                                    CONSTRAINT "playlists_tracks_pk" PRIMARY KEY ("playlist_id", "track_id")
+) WITH (
+      OIDS=FALSE
+    );
+
+CREATE TABLE "payment_methods" (
+                                   "payment_method_id" serial NOT NULL,
+                                   "payment_method_name" varchar(32) NOT NULL,
+                                   CONSTRAINT "payment_methods_pk" PRIMARY KEY ("payment_method_id")
+) WITH (
+      OIDS=FALSE
+    );
+
+ALTER TABLE "tracks" ADD CONSTRAINT "tracks_fk0" FOREIGN KEY ("genre") REFERENCES "genres"("genre_id");
+ALTER TABLE "tracks" ADD CONSTRAINT "tracks_fk1" FOREIGN KEY ("mood") REFERENCES "mood"("mood_id");
+ALTER TABLE "tracks" ADD CONSTRAINT "tracks_fk2" FOREIGN KEY ("license") REFERENCES "licenses"("license_id");
+
+ALTER TABLE "orders" ADD CONSTRAINT "orders_fk0" FOREIGN KEY ("track_id") REFERENCES "tracks"("track_id");
+ALTER TABLE "orders" ADD CONSTRAINT "orders_fk1" FOREIGN KEY ("buyer_id") REFERENCES "buyers"("buyer_id");
+ALTER TABLE "orders" ADD CONSTRAINT "orders_fk2" FOREIGN KEY ("payment_method") REFERENCES "payment_methods"("payment_method_id");
+
+ALTER TABLE "buyers_favorite_tracks" ADD CONSTRAINT "buyers_favorite_tracks_fk0" FOREIGN KEY ("buyer_id") REFERENCES "buyers"("buyer_id");
+ALTER TABLE "buyers_favorite_tracks" ADD CONSTRAINT "buyers_favorite_tracks_fk1" FOREIGN KEY ("track_id") REFERENCES "tracks"("track_id");
+
+ALTER TABLE "authors_tracks" ADD CONSTRAINT "authors_tracks_fk0" FOREIGN KEY ("author_id") REFERENCES "authors"("author_id");
+ALTER TABLE "authors_tracks" ADD CONSTRAINT "authors_tracks_fk1" FOREIGN KEY ("track_id") REFERENCES "tracks"("track_id");
+
+ALTER TABLE "playlists_tracks" ADD CONSTRAINT "playlists_tracks_fk0" FOREIGN KEY ("playlist_id") REFERENCES "playlists"("playlist_id");
+ALTER TABLE "playlists_tracks" ADD CONSTRAINT "playlists_tracks_fk1" FOREIGN KEY ("track_id") REFERENCES "tracks"("track_id");
+
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (0, 'Челомей', 'Алина', 'Даниловна', 'Jula', 'innokentiy1982@mail.ru', '0123456', '50787646800000006468');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (1, 'Шишканов', 'Виталий', 'Германович', 'Julie', 'gerasim15021991@hotmail.com', '1234567', '40975625300000001650');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (2, 'Ненашева', 'Афанасия', 'Кирилловна', 'Julella', 'alisa38@mail.ru', '2345678', '50561457700000006484');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (3, 'Зайцева', 'Варвара', 'Саввановна', 'Marta', 'kira4339@rambler.ru', '3456789', '40961643000000002065');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (4, 'Томсин', 'Юрин', 'Вячеславович', 'Martella', 'veronika.buraya@hotmail.com', '456789', '50130078500000005615');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (5, 'Рыбаков', 'Григорий', 'Тимофеевич', 'Martie', 'afanasiy28041964@hotmail.com', '567890', '50719910100000001167');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (6, 'Петраков', 'Роман', 'Александрович', 'Kellya', 'artem53@ya.ru', '678901', '50109536100000006296');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (7, 'Вельдина', 'Валентина', 'Тимофеевна', 'Kellyie', 'ulyana57@rambler.ru', '789012', '40667909200000006437');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (8, 'Боголюбов', 'Никифор', 'Михаилович', 'Kellyella', 'aleksandr.rugov@yandex.ru', '890123', '50699684200000001292');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (9, 'Самошина', 'Анфиса', 'Ираклиевна', 'Julbob', 'fedot90@hotmail.com', '901234', '40209732200000006837');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (10, 'Малыхина', 'Нонна', 'Трофимовна', 'Martbob', 'lana1976@hotmail.com', '101234', '40695222100000005700');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (11, 'Янкова', 'Кира', 'Николаевна', 'Kellybob', 'yuriy66@outlook.com', '111234', '50517984800000005112');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (12, 'Самарина', 'Екатерина', 'Алексеевна', 'Juliabob', 'rimma40@yandex.ru', '121234', '50101733400000008480');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (13, 'Глебов', 'Семен', 'Ипполитович', 'Snootyman', 'karina6128@yandex.ru', '131234', '40682874700000001020');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (14, 'Скороходова', 'Любовь', 'Игнатьевна', 'ElEss', 'semen.coy@ya.ru', '141234', '50178753800000003135');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (15, 'Кризько', 'Гавриил', 'Александрович', 'Tommy', 'semen.sayankov@yandex.ru', '151234', '40451057800000009954');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (16, 'Гарф', 'Петр', 'Степанович', 'Crapper', 'rimma76@gmail.com', '161234', '40562987700000003818');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (17, 'Сукина', 'Юлиана', 'Антоновна', 'Snyder', 'varvara.perminova@ya.ru', '171234', '50972016500000007153');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (18, 'Хитрово', 'Валентина', 'Елизаровна', 'Lulastic', 'anton06031978@gmail.com', '181234', '50643538000000009332');
+INSERT INTO public.authors (author_id, last_name, first_name, patronymic, nickname, author_email, author_password, payment_details) VALUES (19, 'Бескрёстнов', 'Иннокентий', 'Никитьевич', 'Crane', 'polina1972@outlook.com', '191234', '40228309000000004488');
+
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (0, 'marina.dyhovichnaya@outlook.com', '50930005000000003133');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (1, 'leontiy1545@mail.ru', '50321586200000003754');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (2, 'nikita19@outlook.com', '50715211800000004820');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (3, 'viktoriya27121970@yandex.ru', '40544518800000004910');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (4, 'klavdiya20@hotmail.com', '40847839500000008902');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (5, 'afanasiya1992@yandex.ru', '50800456300000004255');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (6, 'leontiy17121977@hotmail.com', '40409094300000004896');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (7, 'galina1987@yandex.ru', '40645068100000007639');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (8, 'vasiliy.lukashenko@yandex.ru', '40527805600000004836');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (9, 'alla14081968@mail.ru', '40528469100000007396');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (10, 'vitaliy7207@rambler.ru', '40154734200000003559');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (11, 'svetlana.skosyrskaya@yandex.ru', '50827262700000003957');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (12, 'maksim16011967@ya.ru', '40110624100000008195');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (13, 'ivan09021984@outlook.com', '50709926700000005516');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (14, 'efim68@yandex.ru', '40138990200000008438');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (15, 'lavrentiy.sapalev@yandex.ru', '40876836900000009775');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (16, 'prohor.dudkin@hotmail.com', '50427986600000005815');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (17, 'kirill1973@gmail.com', '40407982600000009908');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (18, 'marianna19051982@mail.ru', '50367556300000008716');
+INSERT INTO public.buyers (buyer_id, buyer_email, buyer_password) VALUES (19, 'kuzma10011968@gmail.com', '50413167800000001537');
+
+INSERT INTO public.genres (genre_id, genre_name) VALUES (0, 'Рэп');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (1, 'Трэп');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (2, 'Рок');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (3, 'Джаз');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (4, 'Инди');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (5, 'Поп');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (6, 'Фолк');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (7, 'Альтернатива');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (8, 'Андеграунд');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (9, 'Классическая');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (10, 'Грайм');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (11, 'Хардкор');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (12, 'Дабстеп');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (13, 'Трилл');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (14, 'Фонк');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (15, 'Фанк');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (16, 'Соул');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (17, 'Ритм-н-блюз');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (18, 'Неосоул');
+INSERT INTO public.genres (genre_id, genre_name) VALUES (19, 'Блюз');
+
+INSERT INTO public.mood (mood_id, mood_name) VALUES (0, 'Летнее');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (1, 'Грустное');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (2, 'Радостное');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (3, 'Агрессивное');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (4, 'Расслабленное');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (5, 'Мрачное');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (6, 'Мечтательное');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (7, 'Позитивное');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (8, 'Спокойное');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (9, 'Решительное');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (10, 'Игривое');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (11, 'Праздничное');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (12, 'Лирическое');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (13, 'Бодрое');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (14, 'Пасмурное');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (15, 'Паническое');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (16, 'Шутливое');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (17, 'Сентиментальное');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (18, 'Гнетущее');
+INSERT INTO public.mood (mood_id, mood_name) VALUES (19, 'Тоскливое');
+
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (0, 'Лицензия №1', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '1000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (1, 'Лицензия №2', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '5000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (2, 'Лицензия №3', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '8000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (3, 'Лицензия №4', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '6000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (4, 'Лицензия №5', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '3000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (5, 'Лицензия №6', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '4000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (6, 'Лицензия №7', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '1000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (7, 'Лицензия №8', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '5000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (8, 'Лицензия №9', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '8000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (9, 'Лицензия №10', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '6000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (10, 'Лицензия №11', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '1000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (11, 'Лицензия №12', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '5000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (12, 'Лицензия №13', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '8000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (13, 'Лицензия №14', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '6000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (14, 'Лицензия №15', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '3000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (15, 'Лицензия №16', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '4000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (16, 'Лицензия №17', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '1000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (17, 'Лицензия №18', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '5000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (18, 'Лицензия №19', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '8000');
+INSERT INTO public.licenses (license_id, license_name, license_conditions, license_price) VALUES (19, 'Лицензия №20', 'Разрешается использование инструментала в коммерческих целях с ограничением числа продаж до 2 500 копий.', '6000');
+
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (0, 'Oppose', 150, 'track1.png', 0, 0, 0);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (1, 'Vegetation', 140, 'track2.png', 1, 1, 1);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (2, 'Tempt', 130, 'track3.png', 2, 2, 2);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (3, 'Qualification', 120, 'track4.png', 3, 3, 3);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (4, 'Infection', 40, 'track5.png', 4, 4, 4);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (5, 'Reference', 90, 'track6.png', 5, 5, 5);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (6, 'Angle', 80, 'track7.png', 6, 6, 6);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (7, 'Laborer', 70, 'track8.png', 7, 7, 7);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (8, 'Fail', 60, 'track9.png', 8, 8, 8);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (9, 'Ecstasy', 50, 'track10.png', 9, 9, 9);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (10, 'Heir', 150, 'track1.png', 10, 10, 10);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (11, 'Ground', 140, 'track2.png', 11, 11, 11);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (12, 'Stop', 130, 'track3.png', 12, 12, 12);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (13, 'Include', 120, 'track4.png', 13, 13, 13);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (14, 'Wait', 40, 'track5.png', 14, 14, 14);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (15, 'Challenge', 90, 'track6.png', 15, 15, 15);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (16, 'Office', 80, 'track7.png', 16, 16, 16);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (17, 'Dangerous', 70, 'track8.png', 17, 17, 17);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (18, 'Irony', 60, 'track9.png', 18, 18, 18);
+INSERT INTO public.tracks (track_id, track_name, bpm, track_artwork, genre, mood, license) VALUES (19, 'Assumption', 50, 'track10.png', 19, 19, 19);
+
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (0, 'YooMoney');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (1, 'Сбербанк');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (2, 'Тинькофф');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (3, 'WebMoney');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (4, 'Qiwi');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (5, 'Альфа-Банк');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (6, 'Visa');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (7, 'Mastercard');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (8, 'ВТБ');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (9, 'Газпромбанк');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (10, 'Яндекс.Деньги');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (11, 'EasyPay');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (12, 'SharPay');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (13, 'LeoWallet');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (14, 'Global Money');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (15, 'PayPal');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (16, 'Payeer');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (17, 'AdvCash');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (18, 'Perfect Money');
+INSERT INTO public.payment_methods (payment_method_id, payment_method_name) VALUES (19, 'Банк России');
+
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (0, '2020-11-10', 0, 0, 0);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (1, '2020-11-02', 1, 1, 1);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (2, '2020-11-12', 2, 2, 2);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (3, '2020-11-15', 3, 3, 3);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (4, '2020-11-07', 4, 4, 4);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (5, '2020-11-11', 5, 5, 5);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (6, '2020-11-16', 6, 6, 6);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (7, '2020-11-19', 7, 7, 7);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (8, '2020-11-13', 8, 8, 8);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (9, '2020-11-04', 9, 9, 9);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (10, '2020-11-01', 10, 10, 10);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (11, '2020-11-10', 11, 11, 11);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (12, '2020-11-20', 12, 12, 12);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (13, '2020-11-06', 13, 13, 13);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (14, '2020-11-05', 14, 14, 14);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (15, '2020-11-09', 15, 15, 15);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (16, '2020-11-08', 16, 16, 16);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (17, '2020-11-17', 17, 17, 17);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (18, '2020-11-14', 18, 18, 19);
+INSERT INTO public.orders (order_id, date, track_id, buyer_id, payment_method) VALUES (19, '2020-11-03', 19, 19, 19);
+
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (0, 0);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (0, 1);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (2, 2);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (3, 2);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (4, 4);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (4, 5);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (6, 6);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (7, 6);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (8, 8);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (8, 9);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (10, 10);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (11, 10);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (12, 12);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (12, 13);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (14, 14);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (15, 14);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (16, 16);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (16, 17);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (18, 18);
+INSERT INTO public.buyers_favorite_tracks (buyer_id, track_id) VALUES (19, 18);
+
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (0, 0);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (0, 1);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (2, 2);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (3, 2);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (4, 4);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (4, 5);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (6, 6);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (7, 6);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (8, 8);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (8, 9);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (10, 10);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (11, 10);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (12, 12);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (12, 13);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (14, 14);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (15, 14);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (16, 16);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (16, 17);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (18, 18);
+INSERT INTO public.authors_tracks (author_id, track_id) VALUES (19, 18);
+
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (0, 'Плейлист №1', 'artwork1.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (1, 'Плейлист №2', 'artwork2.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (2, 'Плейлист №3', 'artwork3.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (3, 'Плейлист №4', 'artwork4.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (4, 'Плейлист №5', 'artwork5.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (5, 'Плейлист №6', 'artwork6.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (6, 'Плейлист №7', 'artwork7.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (7, 'Плейлист №8', 'artwork8.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (8, 'Плейлист №9', 'artwork9.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (9, 'Плейлист №10', 'artwork10.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (10, 'Плейлист №11', 'artwork11.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (11, 'Плейлист №12', 'artwork12.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (12, 'Плейлист №13', 'artwork13.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (13, 'Плейлист №14', 'artwork14.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (14, 'Плейлист №15', 'artwork15.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (15, 'Плейлист №16', 'artwork16.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (16, 'Плейлист №17', 'artwork17.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (17, 'Плейлист №18', 'artwork18.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (18, 'Плейлист №19', 'artwork19.png');
+INSERT INTO public.playlists (playlist_id, playlist_name, playlist_artwork) VALUES (19, 'Плейлист №20', 'artwork20.png');
+
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (0, 0);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (0, 1);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (2, 2);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (3, 2);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (4, 4);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (4, 5);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (6, 6);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (7, 6);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (8, 8);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (8, 9);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (10, 10);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (11, 10);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (12, 12);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (12, 13);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (14, 14);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (15, 14);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (16, 16);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (16, 17);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (18, 18);
+INSERT INTO public.playlists_tracks (playlist_id, track_id) VALUES (19, 18);
