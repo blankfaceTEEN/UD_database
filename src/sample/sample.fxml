@@ -13,9 +13,9 @@
       <Separator layoutX="295.0" layoutY="-4.0" orientation="VERTICAL" prefHeight="83.0" prefWidth="13.0" />
       <Label layoutX="20.0" layoutY="37.0" prefHeight="17.0" prefWidth="50.0" />
       <Button fx:id="insertButton" layoutX="14.0" layoutY="42.0" mnemonicParsing="false" onAction="#insertWindow" prefHeight="25.0" prefWidth="71.0" text="Добавить" />
-      <Button disable="true" layoutX="119.0" layoutY="42.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="71.0" text="Удалить" />
+      <Button fx:id="deleteButton" layoutX="119.0" layoutY="42.0" mnemonicParsing="false" onAction="#delete" prefHeight="25.0" prefWidth="71.0" text="Удалить" />
       <Button layoutX="13.0" layoutY="88.0" mnemonicParsing="false" onAction="#buildData" prefHeight="25.0" prefWidth="574.0" text="Обновить таблицу" />
-      <Button disable="true" layoutX="225.0" layoutY="42.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="71.0" text="Изменить" />
+      <Button fx:id="updateButton" layoutX="225.0" layoutY="42.0" mnemonicParsing="false" onAction="#insertUpdateWindow" prefHeight="25.0" prefWidth="71.0" text="Изменить" />
       <ChoiceBox fx:id="columnsChoiceBox" layoutX="377.0" layoutY="10.0" prefHeight="25.0" prefWidth="210.0" />
       <Label layoutX="6.0" layoutY="417.0" prefHeight="25.0" prefWidth="586.0" text="База данных Хисамова И.Р. и Шакирзянова А.А." />
       <Button layoutX="447.0" layoutY="42.0" mnemonicParsing="false" onAction="#desc" prefHeight="25.0" prefWidth="140.0" text="По убыванию" />

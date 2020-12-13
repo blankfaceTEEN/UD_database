@@ -13,6 +13,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -31,6 +33,7 @@ public class Controller implements Initializable {
     private ArrayList<String> columns = new ArrayList<String>();
     public String choiceBoxValue = "tracks";
     private boolean ascdesc = true;
+    private int index = -1;
     private ArrayList<TextField> textFields = new ArrayList<>();
     @FXML
     private TableView tableDB = new TableView();
@@ -87,6 +90,29 @@ public class Controller implements Initializable {
         stage.show();
     }
 
+    @FXML
+    private void insertUpdateWindow(ActionEvent event) throws IOException {
+        Stage stage = new Stage();
+        FXMLDocumentUpdateController(stage);
+    }
+
+    protected void FXMLDocumentUpdateController(Stage stage) throws IOException {
+        if (index != -1) {
+            ObservableList row = (ObservableList) tableDB.getItems().get(index);
+            System.out.println("Изменяем строку: " + row);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("update.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root, 400, 400);
+            stage.getIcons().add(new Image("file:src/sample/icon.png"));
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.setTitle("Изменить запись");
+            UpdateController updateController = (UpdateController) loader.getController();
+            updateController.transport(columns, choiceBoxValue, index, row);
+            stage.show();
+        }
+    }
+
     public void buildData() {
         columns.clear();
         for (int i = 0; i < tableDB.getColumns().size(); i++) {
@@ -141,6 +167,14 @@ public class Controller implements Initializable {
             }
         };
         tablesChoiceBox.getSelectionModel().selectedItemProperty().addListener(changeListener);
+
+        tableDB.setOnMouseClicked((MouseEvent event) -> {
+            if (event.getButton().equals(MouseButton.PRIMARY)) {
+                index = tableDB.getSelectionModel().getSelectedIndex();
+                //Person person = table.getItems().get(index);
+                System.out.println(index);
+            }
+        });
     }
 
     public void grouping() {
@@ -215,6 +249,20 @@ public class Controller implements Initializable {
         } catch (SQLException ex) {
             System.err.println("Error");
             ex.printStackTrace(System.err);
+        }
+    }
+
+    public void delete() {
+        ObservableList row = (ObservableList) tableDB.getItems().get(index);
+        System.out.println("Удаляем строку: " + row);
+        String SQL = "DELETE FROM market.public." + choiceBoxValue + " WHERE " + columns.get(0) + " = " + row.get(0).toString();
+        System.out.println(SQL);
+        try {
+            Connection conn = getDBConnection();
+            conn.createStatement().executeQuery(SQL);
+            System.out.println("Удалили запись" + row);
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 }

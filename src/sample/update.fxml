@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.UpdateController">
+   <children>
+      <Button fx:id="updateRecordButton" layoutX="14.0" layoutY="361.0" mnemonicParsing="false" onAction="#updateRecord" prefHeight="25.0" prefWidth="373.0" text="Изменить" />
+      <Label fx:id="label1" layoutX="14.0" layoutY="14.0" prefHeight="17.0" prefWidth="373.0" />
+      <TextField fx:id="column1" editable="false" layoutX="14.0" layoutY="31.0" prefHeight="25.0" prefWidth="373.0" />
+      <Label fx:id="label5" layoutX="14.0" layoutY="182.0" prefHeight="17.0" prefWidth="373.0" />
+      <Label fx:id="label2" layoutX="14.0" layoutY="56.0" prefHeight="17.0" prefWidth="373.0" />
+      <TextField fx:id="column2" editable="false" layoutX="14.0" layoutY="73.0" prefHeight="25.0" prefWidth="373.0" />
+      <TextField fx:id="column3" editable="false" layoutX="14.0" layoutY="115.0" prefHeight="25.0" prefWidth="373.0" />
+      <TextField fx:id="column7" editable="false" layoutX="14.0" layoutY="283.0" prefHeight="25.0" prefWidth="373.0" />
+      <TextField fx:id="column4" editable="false" layoutX="14.0" layoutY="157.0" prefHeight="25.0" prefWidth="373.0" />
+      <TextField fx:id="column5" editable="false" layoutX="14.0" layoutY="199.0" prefHeight="25.0" prefWidth="373.0" />
+      <TextField fx:id="column6" editable="false" layoutX="14.0" layoutY="241.0" prefHeight="25.0" prefWidth="373.0" />
+      <TextField fx:id="column8" editable="false" layoutX="14.0" layoutY="325.0" prefHeight="25.0" prefWidth="373.0" />
+      <Label fx:id="label3" layoutX="14.0" layoutY="98.0" prefHeight="17.0" prefWidth="373.0" />
+      <Label fx:id="label4" layoutX="14.0" layoutY="140.0" prefHeight="17.0" prefWidth="373.0" />
+      <Label fx:id="label6" layoutX="14.0" layoutY="224.0" prefHeight="17.0" prefWidth="373.0" />
+      <Label fx:id="label7" layoutX="14.0" layoutY="266.0" prefHeight="17.0" prefWidth="373.0" />
+      <Label fx:id="label8" layoutX="14.0" layoutY="308.0" prefHeight="17.0" prefWidth="373.0" />
+   </children>
+</AnchorPane>
